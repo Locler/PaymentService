@@ -4,6 +4,7 @@ import com.dtos.UserInfoDto;
 import com.enums.UserRole;
 import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
@@ -12,6 +13,7 @@ import java.util.Set;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceClient {
 
     private final WebClient.Builder webClientBuilder;
@@ -21,6 +23,9 @@ public class UserServiceClient {
 
     @CircuitBreaker(name = "userServiceCircuitBreaker", fallbackMethod = "fallbackUserById")
     public UserInfoDto getUserById(Long userId, Long requesterId, Set<UserRole> roles) {
+
+        log.info("UserServiceBaseUrl = {} ", userServiceBaseUrl);
+        log.info("Fetching user with id = {} ", userId);
 
         WebClient client = webClientBuilder.baseUrl(userServiceBaseUrl).build();
 
