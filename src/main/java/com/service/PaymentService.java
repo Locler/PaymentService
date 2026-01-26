@@ -11,6 +11,7 @@ import com.dtos.UserInfoDto;
 import com.entity.Payment;
 import com.enums.PaymentStatus;
 import com.enums.UserRole;
+import com.event.CreatePaymentEvent;
 import com.mapper.PaymentMapper;
 import com.repository.PaymentRepository;
 import jakarta.validation.Valid;
@@ -28,6 +29,7 @@ import java.util.Set;
 @Service
 public class PaymentService {
 
+    private final PaymentEventProducer paymentEventProducer;
     private final PaymentRepository paymentRepository;
     private final PaymentMapper mapper;
     private final UserServiceClient userServiceClient;
@@ -36,7 +38,8 @@ public class PaymentService {
     private final AccessChecker accessChecker;
 
     @Autowired
-    public PaymentService(PaymentRepository paymentRepository, PaymentMapper mapper, UserServiceClient userServiceClient, OrderServiceClient orderServiceClient, RandomNumberClient randomNumberClient, AccessChecker accessChecker) {
+    public PaymentService(PaymentEventProducer paymentEventProducer, PaymentRepository paymentRepository, PaymentMapper mapper, UserServiceClient userServiceClient, OrderServiceClient orderServiceClient, RandomNumberClient randomNumberClient, AccessChecker accessChecker) {
+        this.paymentEventProducer = paymentEventProducer;
         this.paymentRepository = paymentRepository;
         this.mapper = mapper;
         this.userServiceClient = userServiceClient;
@@ -75,7 +78,18 @@ public class PaymentService {
         Payment payment = mapper.toEntity(dto);
         payment.setStatus(randomNumberClient.resolvePaymentStatus());
 
-        return mapper.toDto(paymentRepository.save(payment));
+        Payment savedPayment = paymentRepository.save(payment);
+
+        //Kafka событие
+        CreatePaymentEvent event = CreatePaymentEvent.builder()
+                .orderId(dto.getOrderId())
+                .paymentId(savedPayment.getId())
+                .status(savedPayment.getStatus())
+                .build();
+
+        paymentEventProducer.sendCreatePaymentEvent(event);
+
+        return mapper.toDto(savedPayment);
     }
 
     @Transactional(readOnly = true)
