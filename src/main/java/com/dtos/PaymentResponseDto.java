@@ -2,7 +2,6 @@ package com.dtos;
 
 import com.enums.PaymentStatus;
 import jakarta.validation.constraints.DecimalMin;
-import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -25,7 +24,7 @@ public class PaymentResponseDto {
     @NotNull
     private Long userId;
 
-    @NotBlank
+    @NotNull
     private PaymentStatus status;
 
     @NotNull
