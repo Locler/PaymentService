@@ -30,7 +30,6 @@ public class Payment {
     @Column(name = "user_id", nullable = false)
     private Long userId;
 
-    @Builder.Default
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 32)
     private PaymentStatus status = PaymentStatus.NEW;
