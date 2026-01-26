@@ -52,9 +52,6 @@
             <column name="user_id"/>
         </createIndex>
 
-        <createIndex indexName="idx_payments_status" tableName="payments">
-            <column name="status"/>
-        </createIndex>
 
     </changeSet>
 

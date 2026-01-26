@@ -24,7 +24,6 @@ services:
     container_name: payment-service
     depends_on:
       - payment-db
-      - kafka
     ports:
       - "8084:8084"
     environment:
