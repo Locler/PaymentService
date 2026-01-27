@@ -33,5 +33,5 @@ build/
 .vscode/
 
 # env files
-.env.local
+.env
 .env.docker
