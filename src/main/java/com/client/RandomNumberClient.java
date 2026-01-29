@@ -11,6 +11,9 @@ import org.springframework.web.reactive.function.client.WebClient;
 @RequiredArgsConstructor
 public class RandomNumberClient {
 
+    @Value("${external.random.api.base-url}")
+    private String baseUrl;
+
     @Value("${external.random.api.path}")
     private String path;
 
@@ -22,23 +25,24 @@ public class RandomNumberClient {
 
     public PaymentStatus resolvePaymentStatus() {
         try {
-
-            String uri = path + "?" + query;
-
-            Integer number = webClientBuilder.build()
+            Integer[] response = webClientBuilder
+                    .baseUrl(baseUrl)
+                    .build()
                     .get()
-                    .uri(uri)
+                    .uri(path + query)
                     .retrieve()
-                    .bodyToMono(Integer.class)
+                    .bodyToMono(Integer[].class)
                     .block();
 
-            if (number == null) {
+            if (response == null || response.length == 0) {
                 return PaymentStatus.FAILED;
             }
 
-            return number % 2 == 0 ? PaymentStatus.SUCCESS : PaymentStatus.FAILED;
+            return response[0] % 2 == 0
+                    ? PaymentStatus.SUCCESS
+                    : PaymentStatus.FAILED;
 
-        } catch (Exception ex) {
+        } catch (Exception e) {
             return PaymentStatus.FAILED;
         }
     }
