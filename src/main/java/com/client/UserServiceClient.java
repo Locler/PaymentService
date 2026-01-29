@@ -30,7 +30,7 @@ public class UserServiceClient {
         WebClient client = webClientBuilder.baseUrl(userServiceBaseUrl).build();
 
         UserInfoDto user = client.get()
-                .uri("/{id}", userId)
+                .uri("/users/{id}", userId)
                 .header("X-User-Id", requesterId.toString())
                 .header("X-User-Roles", rolesToHeader(roles))
                 .retrieve()
