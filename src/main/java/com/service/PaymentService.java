@@ -57,6 +57,9 @@ public class PaymentService {
         if (dto.getPaymentAmount().compareTo(BigDecimal.ZERO) <= 0) {
             throw new IllegalArgumentException("Payment amount must be positive");
         }
+        if (dto.getOrderId() == null || dto.getUserId() == null) {
+            throw new IllegalArgumentException("orderId and userId are required");
+        }
 
         accessChecker.checkUserAccess(dto.getUserId(), requesterId, roles);
 
@@ -64,6 +67,7 @@ public class PaymentService {
         if (user == null || !Boolean.TRUE.equals(user.getActive())) {
             throw new IllegalStateException("Inactive or unknown user");
         }
+
 
         OrderDto order = orderServiceClient.getOrderById(dto.getOrderId(), requesterId, roles);
 
